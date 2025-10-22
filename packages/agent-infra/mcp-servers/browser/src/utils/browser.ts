@@ -130,8 +130,11 @@ export async function ensureBrowser() {
   // priority 3: create new browser and page
   if (!store.globalBrowser) {
     const browser = store.globalConfig.remoteOptions
-      ? new RemoteBrowser(store.globalConfig.remoteOptions)
-      : new LocalBrowser();
+      ? new RemoteBrowser({
+          ...store.globalConfig.remoteOptions,
+          logger: logger,
+        })
+      : new LocalBrowser({ logger: logger });
     await browser.launch(store.globalConfig.launchOptions);
 
     store.globalBrowser = browser.getBrowser();
@@ -179,6 +182,7 @@ export async function ensureBrowser() {
     if (proxy.username || proxy.password) {
       await store.globalPage.authenticate({
         username: proxy.username,
+        // secretlint-disable-next-line
         password: proxy.password,
       });
     }
